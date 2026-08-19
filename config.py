@@ -1,7 +1,11 @@
 # from app import app
+import os
+from dotenv import load_dotenv
 
-SQLALCHEMY_DATABASE_URI = "postgresql://mridul:password@localhost:5432/flask"
-SECRET_KEY = 'b21ccbc2e2fb9e7749c0ef273f0a364cc9de3b2905e1c4c6898abc15bcdb34ae'
+load_dotenv()
+
+SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # import os
 

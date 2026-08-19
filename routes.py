@@ -4,11 +4,14 @@ from flask import request, jsonify, Blueprint, session
 from services import register_service, login_service, profile_service, logout_service
 
 from models import User, db
+from schemas import LoginRequest, RegisterRequest
+from flask_pydantic import validate
 
 main = Blueprint('main', __name__)
 
 @main.route("/register", methods = ['POST'])
-def register():
+@validate()
+def register(body : RegisterRequest):
     """
     User Registration
     ---
@@ -42,19 +45,19 @@ def register():
       500:
         description: Internal server error during registration
     """
-    data=request.get_json()
-    if not data:
-        return jsonify({"error" : "Missing/Invalid JSON body."})
-    name = data.get('name')
-    email = data.get('email')
+    if not body:
+        return jsonify({"error" : "Missing/Invalid body."})
+    name = body.name
+    email = body.email
     # print(email)
-    password = data.get('password')
+    password = body.password
     if not name or not email or not password:
         return jsonify({"error":"One of the required fields is missing"})
     return register_service(name, email, password)
 
 @main.route("/login", methods = ['POST'])
-def login():
+@validate()
+def login(body : LoginRequest):
     """
     User Login
     ---
@@ -82,11 +85,11 @@ def login():
       500:
         description: Authentication error or server issues
     """
-    data = request.get_json()
-    if not data:
+    # data = request.get_json()
+    if not body:
         return jsonify({"error" : "Missing/Invalid JSON body."})
-    email = data.get('email')
-    password = data.get('password')
+    email = body.email
+    password = body.password
     return login_service(email, password)
 
 @main.route("/profile", methods = ['GET'])
