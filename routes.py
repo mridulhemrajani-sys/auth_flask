@@ -1,7 +1,8 @@
 from flask import request, jsonify, Blueprint, session
 # from app import app
 # import bcrypt
-from services import register_service, login_service, profile_service, logout_service
+from services import register_service, login_service, profile_service, logout_service, refresh_service
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import User, db
 from schemas import LoginRequest, RegisterRequest
@@ -93,12 +94,15 @@ def login(body : LoginRequest):
     return login_service(email, password)
 
 @main.route("/profile", methods = ['GET'])
+@jwt_required()
 def profile():
     """
     Get User Profile
     ---
     tags:
       - User Actions
+    security:
+      - Bearer: []
     responses:
       200:
         description: User details retrieved successfully
@@ -114,22 +118,31 @@ def profile():
       500:
         description: User not found or session expired
     """
-    user_id=session.get('user_id')
+    user_id=get_jwt_identity()
+    print(user_id)
     return profile_service(user_id)
 
 @main.route("/logout", methods = ['GET'])
+@jwt_required()
 def logout():
     """
     User Logout
     ---
     tags:
       - Authentication
+    security:
+      - Bearer: []
     responses:
       200:
         description: User logged out successfully
       500:
         description: Logout processing errors
     """
-    user_id=session.get('user_id')
+    user_id=get_jwt_identity()
     return logout_service(user_id)
+
+@main.route("/refresh", methods = ['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    return refresh_service()
     

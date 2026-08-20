@@ -1,12 +1,18 @@
 # from app import app
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
+from flask_jwt_extended import JWTManager
 
 load_dotenv()
 
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
-SECRET_KEY = os.getenv('SECRET_KEY')
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+JWT_VERIFY_SUB = False
 
+jwt = JWTManager()
 # import os
 
 # class Config:
